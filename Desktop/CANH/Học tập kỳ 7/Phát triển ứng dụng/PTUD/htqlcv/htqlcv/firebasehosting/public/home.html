@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hệ thống lập kế hoạch làm việc</title>
+
+  <link rel="stylesheet" href="./css/style.css">
+
+  <style>
+    .projects {
+      margin: 0 auto;
+      min-width: 500px;
+      max-width: 768px;
+    }
+
+    .projects__header {
+      margin: var(--default-spacer);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .projects__button {
+      background-color: var(--text-light);
+      border: var(--border);
+      display: flex;
+    }
+
+    .projects__button:hover {
+      background-color: var(--primary-color);
+      fill: var(--text-light);
+    }
+
+    .projects__button--no-border {
+      border: none;
+      padding: var(--default-spacer) calc(var(--default-spacer) * 0.5);
+    }
+
+    .projects__button>svg {
+      width: 1em;
+      height: 1em;
+    }
+
+    .table__data {
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .table__data__item {
+      width: 100%;
+      padding: 0 var(--default-spacer);
+    }
+
+    @media only screen and (max-width: 425px) {
+      .projects {
+        min-width: auto;
+        margin: var(--default-spacer);
+      }
+    }
+
+    .dropdown__body {
+      min-width: 250px;
+    }
+
+    .modal__body #project-shareable:checked~#project-embed-link {
+      background-color: lightgrey;
+      color: grey;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- header -->
+  <header class="header">
+    <h2 class="header__brand">Hệ thống lập kế hoạch làm việc</h2>
+
+    <div class="header__menu dropdown">
+      <a href="javascript:void(0)" class="button header__button dropdown__button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+          <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+          <path d="M0 96C0 78.33 14.33 64 32 64H416C433.7 64 448 78.33 448 96C448 113.7 433.7 128 416 128H32C14.33 128 0 113.7 0 96zM0 256C0 238.3 14.33 224 32 224H416C433.7 224 448 238.3 448 256C448 273.7 433.7 288 416 288H32C14.33 288 0 273.7 0 256zM416 448H32C14.33 448 0 433.7 0 416C0 398.3 14.33 384 32 384H416C433.7 384 448 398.3 448 416C448 433.7 433.7 448 416 448z" />
+        </svg>
+      </a>
+
+      <div class="header__dropdown dropdown__body">
+        <a href="javascript:showUpdateProfileName();" class="header__item dropdown__item">Cập nhật tên người dùng</a>
+        <a href="javascript:signOut();" class="header__item dropdown__item">Đăng xuất</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="spacer"></div>
+
+  <!-- content -->
+  <div class="projects">
+    <!-- email + add button -->
+    <div class="projects__header">
+      <h3 class="projects__email"></h3>
+
+      <div class="spacer"></div>
+
+      <a href="javascript:createProject();" class="button projects__button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+          <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+          <path d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z" />
+        </svg>
+      </a>
+    </div>
+
+    <!-- list project -->
+    <div class="table">
+      <!-- <div class="table__data">
+        <p class="table__data__item" style="display: block;">Bạn chưa có dự án nào cả.</p>
+      </div> -->
+    </div>
+
+  </div>
+
+  <!-- modal update profile name -->
+  <div class="modal__container" id="modal-update-profile-name" style="display: none;">
+    <div class="modal">
+      <!-- modal title -->
+      <h2 class="modal__title">Cập nhật tên người dùng</h2>
+      <a href="javascript:void(0)" class="button modal__button" onclick="hideModal('modal-update-profile-name')">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+          <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+          <path d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z" />
+        </svg>
+      </a>
+
+      <!-- modal body -->
+      <div class="modal__body">
+        <label for="project-name" class="textbox__label">Tên người dùng</label>
+        <input type="text" name="profile-name" id="profile-name" class="textbox">
+        <div class="spacer"></div>
+        <input type="button" value="Cập nhật" class="button button--confirm" onclick="updateProfileName()">
+      </div>
+    </div>
+  </div>
+
+  <!-- modal update project name -->
+  <div class="modal__container" id="modal-update-project-name" style="display: none;">
+    <div class="modal">
+      <!-- modal title -->
+      <h2 class="modal__title">Cập nhật dự án</h2>
+      <a href="javascript:void(0)" class="button modal__button" onclick="hideModal('modal-update-project-name')">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+          <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+          <path d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z" />
+        </svg>
+      </a>
+
+      <!-- modal body -->
+      <div class="modal__body">
+        <label for="project-name" class="textbox__label">Tên dự án</label>
+        <input type="text" name="project-name" id="project-name" class="textbox">
+
+        <div class="spacer--small"></div>
+
+        <label for="project-members" class="textbox__label">Chia sẻ với người khác</label>
+        <input type="text" name="project-members" id="project-members" class="textbox" placeholder="email@email.com...">
+
+        <div class="spacer--small"></div>
+
+        <label for="project-shareable" style="display: block; padding-top: 0.5em;">
+          <input type="checkbox" name="project-shareable" id="project-shareable">
+          <span>Cho phép mọi người xem</span>
+        </label>
+
+        <div class="spacer--small"></div>
+
+        <label for="project-embed-link" class="textbox__label">Mã nhúng</label>
+        <input type="text" name="project-embed-link" id="project-embed-link" class="textbox" readonly>
+
+        <div class="spacer--small"></div>
+
+        <div style="display: flex;">
+          <input type="button" value="Sao chép mã nhúng" class="button button--confirm" onclick="copyLink()">
+          <div class="spacer--small"></div>
+          <input type="button" value="Cập nhật" class="button button--confirm" onclick="updateProjectName()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- loader -->
+  <div class="loader__container" style="display: flex;">
+    <div class="loader"></div>
+  </div>
+
+  <script src="./js/loader.js"></script>
+
+  <script type="module">
+    import { app } from './js/firebase.js';
+    import { initAuth, checkUserSignedIn, updateDisplayName } from './js/auth.js';
+    import { initFirestore, createNew, getListByEmail, getOneById, updateById, updateGeneralById, deleteById } from './js/firestore.js';
+
+    const auth = initAuth(app);
+
+    checkUserSignedIn(auth,
+      async (user) => {
+
+        document.querySelector('.projects__email').innerText = user.displayName || user.email;
+        window.user = user;
+
+        initFirestore(app);
+
+        getListByEmail(user.email).then(projects => {
+          window.projects = projects;
+
+          document.querySelector('.projects .table').innerHTML = '';
+
+          projects.forEach(project => {
+            data2Project(project);
+          });
+
+          hideLoader();
+        });
+      },
+      () => window.open('./login.html', '_self'),
+    );
+
+    window.deleteProject = (id) => {
+      showLoader();
+
+      deleteById(id).then(result => {
+        if (result) {
+          document.getElementById(id).remove();
+        } else {
+          alert('Không thành công');
+        }
+
+        hideLoader();
+      });
+    }
+
+    window.data2Project = (data) => {
+      let shareButton = '';
+
+      if (data.shareable) {
+        shareButton = `
+        <a href="javascript:getLinkEmbed('${data.id}');" class="projects__button projects__button--no-border">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+            <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+            <path d="M414.8 40.79L286.8 488.8C281.9 505.8 264.2 515.6 247.2 510.8C230.2 505.9 220.4 488.2 225.2 471.2L353.2 23.21C358.1 6.216 375.8-3.624 392.8 1.232C409.8 6.087 419.6 23.8 414.8 40.79H414.8zM518.6 121.4L630.6 233.4C643.1 245.9 643.1 266.1 630.6 278.6L518.6 390.6C506.1 403.1 485.9 403.1 473.4 390.6C460.9 378.1 460.9 357.9 473.4 345.4L562.7 256L473.4 166.6C460.9 154.1 460.9 133.9 473.4 121.4C485.9 108.9 506.1 108.9 518.6 121.4V121.4zM166.6 166.6L77.25 256L166.6 345.4C179.1 357.9 179.1 378.1 166.6 390.6C154.1 403.1 133.9 403.1 121.4 390.6L9.372 278.6C-3.124 266.1-3.124 245.9 9.372 233.4L121.4 121.4C133.9 108.9 154.1 108.9 166.6 121.4C179.1 133.9 179.1 154.1 166.6 166.6V166.6z"/>
+          </svg>
+        </a>`;
+      }
+      
+
+      document.querySelector('.projects .table').innerHTML += `
+      <div class="table__data" id="${data.id}">
+        <p class="table__data__item" style="display: block;">${data.name}</p>
+
+        <a href="./index.html?id=${data.id}" class="projects__button projects__button--no-border">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+            <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+            <path d="M256 64C256 46.33 270.3 32 288 32H415.1C415.1 32 415.1 32 415.1 32C420.3 32 424.5 32.86 428.2 34.43C431.1 35.98 435.5 38.27 438.6 41.3C438.6 41.35 438.6 41.4 438.7 41.44C444.9 47.66 447.1 55.78 448 63.9C448 63.94 448 63.97 448 64V192C448 209.7 433.7 224 416 224C398.3 224 384 209.7 384 192V141.3L214.6 310.6C202.1 323.1 181.9 323.1 169.4 310.6C156.9 298.1 156.9 277.9 169.4 265.4L338.7 96H288C270.3 96 256 81.67 256 64V64zM0 128C0 92.65 28.65 64 64 64H160C177.7 64 192 78.33 192 96C192 113.7 177.7 128 160 128H64V416H352V320C352 302.3 366.3 288 384 288C401.7 288 416 302.3 416 320V416C416 451.3 387.3 480 352 480H64C28.65 480 0 451.3 0 416V128z" />
+          </svg>
+        </a>
+
+        <a href="javascript:showUpdateProjectName('${data.id}', ${data.shareable}, '${data.members}');" class="projects__button projects__button--no-border">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+            <path d="M490.3 40.4C512.2 62.27 512.2 97.73 490.3 119.6L460.3 149.7L362.3 51.72L392.4 21.66C414.3-.2135 449.7-.2135 471.6 21.66L490.3 40.4zM172.4 241.7L339.7 74.34L437.7 172.3L270.3 339.6C264.2 345.8 256.7 350.4 248.4 353.2L159.6 382.8C150.1 385.6 141.5 383.4 135 376.1C128.6 370.5 126.4 361 129.2 352.4L158.8 263.6C161.6 255.3 166.2 247.8 172.4 241.7V241.7zM192 63.1C209.7 63.1 224 78.33 224 95.1C224 113.7 209.7 127.1 192 127.1H96C78.33 127.1 64 142.3 64 159.1V416C64 433.7 78.33 448 96 448H352C369.7 448 384 433.7 384 416V319.1C384 302.3 398.3 287.1 416 287.1C433.7 287.1 448 302.3 448 319.1V416C448 469 405 512 352 512H96C42.98 512 0 469 0 416V159.1C0 106.1 42.98 63.1 96 63.1H192z" />
+          </svg>
+        </a>
+
+        <a href="javascript:deleteProject('${data.id}')" class="projects__button projects__button--no-border">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+            <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+            <path d="M135.2 17.69C140.6 6.848 151.7 0 163.8 0H284.2C296.3 0 307.4 6.848 312.8 17.69L320 32H416C433.7 32 448 46.33 448 64C448 81.67 433.7 96 416 96H32C14.33 96 0 81.67 0 64C0 46.33 14.33 32 32 32H128L135.2 17.69zM31.1 128H416V448C416 483.3 387.3 512 352 512H95.1C60.65 512 31.1 483.3 31.1 448V128zM111.1 208V432C111.1 440.8 119.2 448 127.1 448C136.8 448 143.1 440.8 143.1 432V208C143.1 199.2 136.8 192 127.1 192C119.2 192 111.1 199.2 111.1 208zM207.1 208V432C207.1 440.8 215.2 448 223.1 448C232.8 448 240 440.8 240 432V208C240 199.2 232.8 192 223.1 192C215.2 192 207.1 199.2 207.1 208zM304 208V432C304 440.8 311.2 448 320 448C328.8 448 336 440.8 336 432V208C336 199.2 328.8 192 320 192C311.2 192 304 199.2 304 208z" />
+          </svg>
+        </a>
+      </div>
+      `;
+    }
+
+    window.createProject = () => {
+      showLoader();
+      createNew(window.user.email, 'Kế hoạch làm việc mới').then(result => {
+        data2Project(result);
+        hideLoader();
+      });
+    }
+
+    window.showUpdateProjectName = (projectId, shareable, members) => {
+      document.getElementById('project-name').value = document.querySelector(`#${projectId} .table__data__item`).innerText;
+      document.getElementById('project-members').value = members;
+      document.getElementById('project-shareable').checked = shareable;
+      let embedCode = `${window.location.origin}/view.html?id=${projectId}`;
+      document.getElementById('project-embed-link').value = embedCode;
+
+      let modal = document.getElementById('modal-update-project-name');
+      modal.style.display = "flex";
+      window.selectedId = projectId;
+    }
+
+    window.hideModal = (elementId) => {
+      let modal = document.getElementById(elementId);
+      modal.style.display = "none";
+    }
+
+    window.updateProjectName = () => {
+      showLoader();
+      let newName = document.getElementById('project-name').value;
+      let shareable = document.getElementById('project-shareable').checked;
+      let members = document.getElementById('project-members').value;
+
+      document.querySelector(`#${window.selectedId} .table__data__item`).innerText = newName;
+      updateGeneralById(window.selectedId, newName, shareable, members).then(result => {
+        if (result) window.location.reload();
+        else alert('Không thành công');
+
+        hideModal('modal-update-project-name');
+        hideLoader();
+      });
+    }
+
+    // window.getLinkEmbed = (projectId) => {
+    //   let embedCode = `<iframe width="660" height="371" src="${window.location.origin}/view.html?id=${projectId}" frameborder="0"></iframe>`;
+    //   document.getElementById('project-embed-link').value = embedCode;
+    //   let modal = document.getElementById('modal-embed');
+    //   modal.style.display = "flex";
+    // }
+
+    window.copyLink = () => {
+      /* Get the text field */
+      var copyText = document.getElementById("project-embed-link");
+
+      /* Select the text field */
+      copyText.select();
+      copyText.setSelectionRange(0, 99999); /* For mobile devices */
+
+      /* Copy the text inside the text field */
+      navigator.clipboard.writeText(copyText.value);
+    }
+
+    window.signOut = () => {
+      auth.signOut();
+    }
+
+
+    window.showUpdateProfileName = () => {
+      let displayName = user.displayName || '';
+      document.getElementById('profile-name').value = displayName;
+
+      let modal = document.getElementById('modal-update-profile-name');
+      modal.style.display = "flex";
+
+      window.updateProfileName = () => {
+        updateDisplayName(auth, document.getElementById('profile-name').value,
+          () => window.location.reload(),
+          () => {
+            hideModal('modal-update-profile-name');
+            hideLoader();
+          });
+      }
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hệ thống lập kế hoạch làm việc</title>
+
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+  <!-- header -->
+  <header class="header">
+    <h2 class="header__brand">Hệ thống lập kế hoạch làm việc</h2>
+
+    <div class="header__menu dropdown">
+      <a href="javascript:void(0)" class="button header__button dropdown__button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+          <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+          <path d="M0 96C0 78.33 14.33 64 32 64H416C433.7 64 448 78.33 448 96C448 113.7 433.7 128 416 128H32C14.33 128 0 113.7 0 96zM0 256C0 238.3 14.33 224 32 224H416C433.7 224 448 238.3 448 256C448 273.7 433.7 288 416 288H32C14.33 288 0 273.7 0 256zM416 448H32C14.33 448 0 433.7 0 416C0 398.3 14.33 384 32 384H416C433.7 384 448 398.3 448 416C448 433.7 433.7 448 416 448z" />
+        </svg>
+      </a>
+
+      <div class="header__dropdown dropdown__body">
+        <a href="javascript:void(0);" class="header__item dropdown__item" onclick="exportPDF();">Xuất PDF</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="container">
+    <h2 id="project-name" style="margin-left: var(--default-spacer);"></h2>
+  </section>
+
+  <!-- loader -->
+  <div class="loader__container" style="display: flex;">
+    <div class="loader"></div>
+  </div>
+
+  <script src="./js/loader.js"></script>
+
+  <script type="module">
+    import { app } from './js/firebase.js';
+    import { initFirestore, createNew, getListByEmail, getOneById, updateById, deleteById } from './js/firestore.js';
+
+    initFirestore(app);
+    let id = getParamsFromURL('id');
+
+    if (!id) {
+      alert('Không tìm thấy dự án');
+    }
+
+    getOneById(id).then(project => {
+      data2Table(project.data);
+      document.getElementById('project-name').innerText = project.name;
+
+      window.projectId = id;
+      window.project = project;
+
+      hideLoader();
+    }).catch(e => {
+      window.open('./login.html', '_self')
+    });
+
+    function getParamsFromURL(paramName) {
+      let url = new URL(window.location.href);
+      return url.searchParams.get(paramName);
+    }
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    // render tables from data
+    function data2Table(data) {
+      clearTable();
+
+      // handle data of a table
+      for (let i = 0; i < data.length; i++) {
+        tableData = data[i];
+        addTable(tableData.name);
+
+        // handle data of column
+        columnHTML = `
+        <!-- column -->
+        <div class="table__data table__data--head" style="order: 0">
+          <div class="table__item" style="background-color: var(--info-color);">
+            <div class="table__item__icon">
+              <img src="./images/b-noi-dung-cong-viec.svg" alt="noi-dung-cong-viec">
+            </div>
+            <div class="table__item__description">
+              <h3>Nội dung <br> công việc</h3>
+              <h6></h6>
+            </div>
+          </div>
+        </div>`;
+        columnHTML += handleColumnData2Table(tableData.noiDungCongViec);
+
+        columnHTML += `
+        <!-- column -->
+        <div class="table__data table__data--head" style="order: 0">
+          <div class="table__item" style="background-color: var(--info-color);">
+            <div class="table__item__icon">
+              <img src="./images/b-con-nguoi-thuc-hien.svg" alt="con-nguoi-thuc-hien">
+            </div>
+            <div class="table__item__description">
+              <h3>Người <br> thực hiện</h3>
+              <h6></h6>
+            </div>
+          </div>
+        </div>`;
+        columnHTML += handleColumnData2Table1(tableData.nguoiThucHien);
+
+        columnHTML += `
+        <!-- column -->
+        <div class="table__data table__data--head" style="order: 0">
+          <div class="table__item" style="background-color: var(--success-color);">
+            <div class="table__item__icon">
+              <img src="./images/b-thoi-gian-thuc-hien.svg" alt="thoi-gian-hoan-thanh">
+            </div>
+            <div class="table__item__description">
+              <h3>Thời gian<br>thực hiện</h3>
+              <h6></h6>
+            </div>
+          </div>
+        </div>`;
+        columnHTML += handleColumnData2Table2(tableData.thoiGianThucHien);
+
+        columnHTML += `
+        <!-- column -->
+        <div class="table__data table__data--head" style="order: 0">
+          <div class="table__item" style="background-color: var(--success-color);">
+            <div class="table__item__icon">
+              <img src="./images/b-tien-do-cong-viec.svg" alt="tien-do-cong-viec">
+            </div>
+            <div class="table__item__description">
+              <h3>Tiến độ <br> công việc</h3>
+              <h6></h6>
+            </div>
+          </div>
+        </div>`;
+        columnHTML += handleColumnData2Table(tableData.tienDoCongViec);
+        
+
+
+        document.getElementById(selectedTableId).querySelector('.table__row').innerHTML = columnHTML;
+      }
+    }
+
+    function handleColumnData2Table(column) {
+      columnHTML = '';
+
+      for (let j = 0; j < column.length; j++) {
+        cell = column[j];
+
+        if (cell.type == '') {
+          columnHTML += `<div class="table__data dropzone" style="order:${j + 1}"></div>`;
+        } else {
+          columnHTML += `
+          <div class="table__data dropzone" style="order:${j + 1}">
+            <div class="table__item draggable">
+              <div class="table__item__icon">
+                <img src="./images/${cell.type}.svg" alt="${cell.type}">
+              </div>
+              <div class="table__item__description">${cell.description}</div>
+            </div>
+          </div>`;
+        }
+      }
+
+      return columnHTML;
+    }
+    //
+    //-----------------------TEST
+    function handleColumnData2Table1(column) {
+      columnHTML = '';
+      for (let j = 0; j < column.length; j++) {
+        cell = column[j];
+        
+          columnHTML += `
+          <div class="table__data dropzone" style="order:${j + 1}">
+            <div class="table__item1 draggable" >
+              <div class="table__item__icon">
+                <img src="./images/${cell.type}.svg" alt="${cell.type}">
+              </div>
+              <div class="table__item__description">${cell.description}</div>
+            </div>
+          </div>`;
+      }
+
+      return columnHTML;
+    }
+    //-----------------------TEST2
+    function handleColumnData2Table2(column) {
+      columnHTML = '';
+
+      for (let j = 0; j < column.length; j++) {
+        cell = column[j];
+          
+          columnHTML += `
+          <div class="table__data dropzone" style="order:${j + 1}">
+            <div class="table__item2 draggable2" >
+              <div class="table__item__icon">
+                <img src="./images/${cell.type}.svg" alt="${cell.type}">
+              </div>
+              <div class="table__item__description">${cell.description}</div>
+            </div>
+          </div>`;
+      }
+
+      return columnHTML;
+    }
+
+    // add a table
+    var tableNumber = 1;
+
+    function addTable(tableName = 'Nội dung kế hoạch công việc') {
+      tableNumber++;
+
+      let listTable = document.querySelector('section.container');
+      listTable.innerHTML += `
+      <!-- table -->
+      <div class="table" id="table-${tableNumber}">
+        <!-- table title + button menu -->
+        <div class="">
+          <h3>${tableName}</h3>
+        </div>
+
+        <!-- table row -->
+        <div class="table__row">
+          <!-- column -->
+          <div class="table__data table__data--head" style="order: 0">
+            <div class="table__item" style="background-color: var(--info-color);">
+              <div class="table__item__icon">
+                <img src="./images/b-con-nguoi-thuc-hien.svg" alt="con-nguoi-thuc-hien">
+              </div>
+              <div class="table__item__description">
+                <h3>Nội dung <br> công việc</h3>
+                <h6></h6>
+              </div>
+            </div>
+          </div>
+
+          <div class="table__data dropzone" style="order:1"></div>
+
+          <!-- column -->
+          <div class="table__data table__data--head" style="order: 0">
+            <div class="table__item" style="background-color: var(--info-color);">
+              <div class="table__item__icon">
+                <img src="./images/b-con-nguoi-thuc-hien.svg" alt="con-nguoi-thuc-hien">
+              </div>
+              <div class="table__item__description">
+                <h3>Người <br> thực hiện</h3>
+                <h6></h6>
+              </div>
+            </div>
+          </div>
+
+          <div class="table__data dropzone" style="order:1"></div>
+
+          <!-- column -->
+          <div class="table__data table__data--head" style="order: 0">
+            <div class="table__item" style="background-color: var(--success-color);">
+              <div class="table__item__icon">
+                <img src="./images/b-thoi-gian-thuc-hien.svg" alt="thoi-gian-hoan-thanh">
+              </div>
+              <div class="table__item__description">
+                <h3>Thời gian<br>thực hiện</h3>
+                <h6></h6>
+              </div>
+            </div>
+          </div>
+
+          <div class="table__data dropzone" style="order:1"></div>
+
+          <!-- column -->
+          <div class="table__data table__data--head" style="order: 0">
+            <div class="table__item" style="background-color: var(--success-color);">
+              <div class="table__item__icon">
+                <img src="./images/b-tien-do-cong-viec.svg" alt="tien-do-cong-viec">
+              </div>
+              <div class="table__item__description">
+                <h3>Tiến độ <br> công việc</h3>
+                <h6></h6>
+              </div>
+            </div>
+          </div>
+
+          <div class="table__data dropzone" style="order:1"></div>
+        </div>
+      </div>`;
+
+      selectedTableId = `table-${tableNumber}`;
+    }
+
+    function clearTable() {
+      tables = document.querySelectorAll('.table');
+
+      for (let i = 0; i < tables.length; i++) {
+        tables[i].remove();
+      }
+    }
+
+    function exportPDF() {
+      let width = document.querySelector('section.container').clientWidth;
+      let height = 1.41428571429 * width; // a4 ratio
+
+      let element = document.querySelector('section.container');
+      element.style.width = `${width}px`;
+
+      let counter = 0;
+      let lastHeight = 0;
+      let tables = element.querySelectorAll('.table');
+
+      tables.forEach((table, i) => {
+        counter++;
+
+        table.style.height = table.clientHeight;
+
+        if (counter > 1 && i < tables.length - 1) {
+          let spacer = document.createElement('div');
+          spacer.classList.add('table-separator');
+          spacer.style.width = `${width}px`;
+          spacer.style.height = `calc(${height - table.clientHeight - lastHeight}px - 1em - 2.25em)`;
+
+          table.insertAdjacentElement('afterend', spacer);
+
+          counter = 0;
+        }
+        else {
+          lastHeight = table.clientHeight;
+        }
+      });
+
+      html2pdf().from(element).set({
+        filename: 'lee-schedule-toolkit',
+        image: { type: 'jpeg', quality: 1 },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+        html2canvas: {
+          dpi: 200,
+          scale: 1,
+          width: width,
+        },
+      }).toPdf().get('pdf').then(pdf => {
+        let tableSeparator = document.querySelectorAll('.table-separator');
+        tableSeparator.forEach(element => {
+          element.remove();
+        });
+
+        window.open(pdf.output('bloburl'), '_blank');
+      });
+    }
+  </script>
+</body>
+
+</html>

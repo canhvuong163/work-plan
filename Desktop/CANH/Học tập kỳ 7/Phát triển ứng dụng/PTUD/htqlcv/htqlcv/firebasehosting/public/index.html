@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Hệ thống lập kế hoạch làm việc</title>
+
+  <!-- Datetimepicker -->
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <!-- <link rel="stylesheet" href="/resources/demos/style.css"> -->
+  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+  <script>
+
+    //Datepicker Ngay bat dau
+    $(function () {
+      $(".datepicker").datepicker({
+        dateFormat: "dd/mm/yy",
+        firstDay: 1
+      });
+    
+      $(document).on("click", ".date-picker .input", function (e) {
+        var $me = $(this),
+          $parent = $me.parents(".date-picker");
+        $parent.toggleClass("open");
+      });
+    
+      $(".datepicker").on("change", function () {
+        var $me = $(this),
+          $selected = $me.val(),
+          $parent = $me.parents(".date-picker");
+        $parent.find(".result").children("span").html($selected);
+      });
+    }); 
+
+    //Datepicker Ngay ket thuc   
+    $(function () {
+      $(".datepicker1").datepicker({
+        dateFormat: "dd/mm/yy",
+        firstDay: 1
+      });
+    
+      $(document).on("click", ".date-picker1 .input", function (e) {
+        var $me = $(this),
+          $parent = $me.parents(".date-picker1");
+        $parent.toggleClass("open");
+      });
+    
+      $(".datepicker1").on("change", function () {
+        var $me = $(this),
+          $selected = $me.val(),
+          $parent = $me.parents(".date-picker1");
+        $parent.find(".result").children("span").html($selected);
+      });
+    });    
+  </script>
+  <!-- <script>
+      $( function() {
+        $( "#datepicker1" ).datepicker({
+          dateFormat: 'dd/mm/yy'
+        });
+        
+      } );
+  </script> -->
+  <!--  -->
+
+  <script src="./js/draggable.bundle.js"></script>
+  <link rel="stylesheet" href="./css/style.css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.7.8"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+
+<body>
+  <!-- header -->
+  <header class="header">
+    <h2 class="header__brand">Hệ thống lập kế hoạch làm việc</h2>
+    
+
+    <div class="header__menu dropdown">
+      <a href="javascript:void(0)" class="button header__button dropdown__button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+          <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+          <path d="M0 96C0 78.33 14.33 64 32 64H416C433.7 64 448 78.33 448 96C448 113.7 433.7 128 416 128H32C14.33 128 0 113.7 0 96zM0 256C0 238.3 14.33 224 32 224H416C433.7 224 448 238.3 448 256C448 273.7 433.7 288 416 288H32C14.33 288 0 273.7 0 256zM416 448H32C14.33 448 0 433.7 0 416C0 398.3 14.33 384 32 384H416C433.7 384 448 398.3 448 416C448 433.7 433.7 448 416 448z" />
+        </svg>
+      </a>
+
+      <div class="header__dropdown dropdown__body">
+        <a href="javascript:void(0);" class="header__item dropdown__item" onclick="showModal('modal-intro');">Giới thiệu</a>
+        <a href="javascript:void(0);" class="header__item dropdown__item" onclick="addTable();">Thêm bảng</a>
+        <a href="javascript:void(0);" class="header__item dropdown__item" onclick="exportPDF();">Xuất PDF</a>
+        <a href="javascript:void(0);" class="header__item dropdown__item" onclick="showModalShare();">Chia sẻ</a>
+        <a href="javascript:void(0);" class="header__item dropdown__item">Trợ giúp</a>
+        <a href="javascript:void(0);" class="header__item dropdown__item" onclick="showModal('modal-contact');">Liên hệ</a>
+        <a href="javascript:void(0);" class="header__item dropdown__item" onclick="rePort('modal-report')">Thống kê</a>
+        <a href="javascript:signOut();" class="header__item dropdown__item">Đăng xuất</a>
+      </div>
+    </div>
+  </header>
+
+  <button class="reload" onclick="save()">
+    <img src="https://img.icons8.com/fluency/40/000000/save.png"/>
+  </button>
+
+  <button class="back">
+    <a href="./home.html">
+      <img src="https://img.icons8.com/external-flaticons-flat-flat-icons/40/000000/external-back-web-flaticons-flat-flat-icons.png"/>
+    </a>
+  </button>
+
+  <!-- section -->
+  <section class="container">
+    <h2 id="project-name" style="margin-left: var(--default-spacer);"></h2>
+  </section>
+
+  <!-- modal update table title -->
+  <div class="modal__container" id="modal-update-table-title" style="display: none;">
+    <div class="modal">
+      <!-- modal title -->
+      <h2 class="modal__title">Sửa tên bảng</h2>
+      <a href="javascript:void(0)" class="button modal__button" onclick="hideModal('modal-update-table-title')">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+          <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+          <path d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z" />
+        </svg>
+      </a>
+
+      <!-- modal body -->
+      <div class="modal__body">
+        <label for="new-table-name" class="textbox__label">Tên bảng</label>
+        <input type="text" name="new-table-name" id="new-table-name" class="textbox">
+        <div class="spacer"></div>
+        <input type="button" value="Cập nhật" class="button button--confirm" onclick="updateTableTitle()">
+      </div>
+    </div>
+  </div>
+
+  <!-- modal update description------------------------------- -->
+  <div class="modal__container" id="modal-update-description" style="display: none;">
+    <div class="modal">
+      <!-- modal title -->
+      <h2 class="modal__title">Cập nhật miêu tả</h2>
+      <a href="javascript:void(0)" class="button modal__button" onclick="hideModal('modal-update-description')">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+          <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+          <path d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z" />
+        </svg>
+      </a>
+
+      <!-- modal body -->
+      <div class="modal__body">
+        <label for="new-description" class="textbox__label">Miêu tả</label>
+        <textarea type="text" name="new-description" id="new-description" class="textbox" rows="7"></textarea>
+        <div class="spacer"></div>
+        <input type="button" value="Cập nhật" class="button button--confirm" onclick="updateDescription()">
+      </div>
+    </div>
+  </div>
+
+  <!-- Test --------------------------------------------------------------->
+  <div class="modal__container" id="modal-update-information" style="display: none;">
+    <div class="modal">
+      <!-- modal title -->
+      <h2 class="modal__title">Cập nhật thông tin</h2>
+      <a href="javascript:void(0)" class="button modal__button" onclick="hideModal('modal-update-information')">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+          <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+          <path d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z" />
+        </svg>
+      </a>
+
+      <!-- modal body -->
+      <div class="modal__body">
+        <label for="new-description1" class="textbox__label">Thông tin</label>
+        <textarea type="text" name="new-description1" id="new-description1" class="textbox" rows="7"></textarea>
+        <div class="spacer"></div>
+        <input type="button" value="Cập nhật" class="button button--confirm" onclick="updateinformation()">
+      </div>
+    </div>
+  </div>
+
+  <!-- Test2 ------------------------------------------------------------->
+  <div class="modal__container" id="modal-update-time" style="display: none;">
+    <div class="modal">
+      <!-- modal title -->
+      <h2 class="modal__title">Chọn Thời Gian</h2>
+      <a href="javascript:void(0)" class="button modal__button" onclick="hideModal('modal-update-time')">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+          <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+          <path d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z" />
+        </svg>
+      </a>
+
+      <!-- modal body -->
+      <div class="modal__body">
+        <label for="new-description2" class="textbox__label">Mời chọn thời gian</label>
+        
+        <div class="date-picker">
+          <div class="input">
+            <div class="result">Ngày bắt đầu: <span></span></div>  
+          </div>
+          <div class="datepicker"></div>
+        </div>
+    
+        <div class="date-picker1">
+          <div class="input">
+            <div class="result">Ngày kết thúc: <span></span></div>  
+          </div>
+          <div class="datepicker1"></div>
+        </div>
+        <p></p>
+        <textarea type="text" name="new-description2" id="new-description2" class="textbox" rows="7"></textarea>
+        <div class="spacer"></div>
+        <input type="button" value="Cập nhật" class="button button--confirm" onclick="updateTime()">
+      </div>
+    </div>
+  </div>
+
+
+  <!-- modal intro -->
+  <div class="modal__container" id="modal-intro" style="display: none;">
+    <div class="modal">
+      <!-- modal title -->
+      <h2 class="modal__title">Giới thiệu</h2>
+      <a href="javascript:void(0)" class="button modal__button" onclick="hideModal('modal-intro')">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+          <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+          <path d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z" />
+        </svg>
+      </a>
+
+      <!-- modal body -->
+      <div class="modal__body">
+        <p>Bộ công cụ thiết kế bài giảng trực tuyến này xây dựng phương pháp thiết kế khoá học, trực tuyến, hoặc và kết hợp theo mô hình lớp học đảo ngược. Mô hình này người học sẽ tương tác với nội dung bài học trước thông qua các nền tảng số, sau đó gặp người hướng dẫn trực tuyến hoặc và trực tiếp tại lớp. Theo đó, cấu trúc của khoá học được chia làm hai giai đoạn giai đoạn tự học và giai đoạn học có sự hướng dẫn của người dạy.</p>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- modal report -->
+  <div class="modal__container1" id="modal-report" style="display: none;" >
+    <div class="modal">
+       <!-- modal title -->
+      <h2 class="modal__title">Thống kê</h2>
+      <a href="javascript:void(0)" class="button modal__button" onclick="hideModal('modal-report')">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+          <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+          <path d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z" />
+        </svg>
+      </a>
+
+       <!-- modal body -->
+       <div class="modal__body1">
+          <canvas id="chart__report"></canvas>
+          <div id="thongKe" class="rePort">
+          </div>
+       </div>
+    </div>
+  </div>
+
+  <!-- modal contact -->
+  <div class="modal__container" id="modal-contact" style="display: none;">
+    <div class="modal">
+      <!-- modal title -->
+      <h2 class="modal__title">Liên hệ</h2>
+      <a href="javascript:void(0)" class="button modal__button" onclick="hideModal('modal-contact')">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+          <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+          <path d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z" />
+        </svg>
+      </a>
+
+      <!-- modal body -->
+      <div class="modal__body">
+        <ul style="padding: calc(var(--default-spacer) * 0.5);">
+          <li>SĐT: 0984821007</li>
+          <li>Email: <a href="mailto:letruonglhu@gmail.com">letruonglhu@gmail.com</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- modal update project name -->
+  <div class="modal__container" id="modal-update-project-name" style="display: none;">
+    <div class="modal">
+      <!-- modal title -->
+      <h2 class="modal__title">Chia sẻ</h2>
+      <a href="javascript:void(0)" class="button modal__button" onclick="hideModal('modal-update-project-name')">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+          <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+          <path d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z" />
+        </svg>
+      </a>
+
+      <!-- modal body -->
+      <div class="modal__body">
+        <label style="display:none;" for="project-name" class="textbox__label">Tên dự án</label>
+        <input style="display:none;" type="text" name="project-name" id="project-name" class="textbox">
+
+        <div style="display: none;" class="spacer--small"></div>
+
+        <label for="project-members" class="textbox__label">Chia sẻ với người khác</label>
+        <input type="text" name="project-members" id="project-members" class="textbox" placeholder="email@email.com...">
+
+        <div class="spacer--small"></div>
+
+        <label for="project-shareable" style="display: block; padding-top: 0.5em;">
+          <input type="checkbox" name="project-shareable" id="project-shareable">
+          <span>Cho phép mọi người xem</span>
+        </label>
+
+        <div class="spacer--small"></div>
+
+        <label for="project-embed-link" class="textbox__label">Mã nhúng</label>
+        <input type="text" name="project-embed-link" id="project-embed-link" class="textbox" readonly>
+
+        <div class="spacer--small"></div>
+
+        <div style="display: flex;">
+          <input type="button" value="Sao chép mã nhúng" class="button button--confirm" onclick="copyLink()">
+          <div class="spacer--small"></div>
+          <input type="button" value="Cập nhật" class="button button--confirm" onclick="updateProjectName()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- toolbar -->
+  <div class="toolbar__container">
+    <div id="toolbar" class="container"></div>
+  </div>
+
+  <!-- context menu -->
+  <div id="context-menu--item" class="context-menu" style="display: none"; >
+    <a href="javascript:void(0)" class="dropdown__item" onclick="showModalUpdateDescription()">Sửa miêu tả</a>
+    <a href="javascript:void(0)" class="dropdown__item" onclick="deleteItem();">Xoá</a>
+  </div>
+
+  <!-- menu Nhap noi dung -->
+  <div id="input-menu--item" class="context-menu" style="display: none"; >
+    <a href="javascript:void(0)" class="dropdown__item" onclick="showModalUpdateInformation()">Nhập thông tin</a>
+    <a href="javascript:void(0)" class="dropdown__item" onclick="deleteItem();">Xoá</a>
+  </div>
+
+  <!-- menu chon thoi gian -->
+  <div id="input-menu--time" class="context-menu" style="display: none"; >
+    <a href="javascript:void(0)" class="dropdown__item" onclick="showModalUpdateTime()">Chọn thời gian</a>
+    <a href="javascript:void(0)" class="dropdown__item" onclick="deleteItem();">Xoá</a>
+  </div>
+
+
+  <div id="context-menu--table" class="context-menu" style="display: none;">
+    <a href="javascript:void(0);" class="dropdown__item" onclick="showUpdateTableTitle();">Sửa tên bảng</a>
+    <a href="javascript:void(0);" class="dropdown__item" onclick="removeTable();">Xoá bảng này</a>
+    <a href="javascript:void(0);" class="dropdown__item" onclick="addRow();">Thêm dòng</a>
+    <a href="javascript:void(0);" class="dropdown__item" onclick="removeLastRow();">Xóa dòng cuối</a>
+  </div>
+
+  <!-- loader -->
+  <div class="loader__container" style="display: flex;">
+    <div class="loader"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="./js/app.js"></script>
+  <script src="./js/loader.js"></script>
+
+  <script type="module">
+    import { app } from './js/firebase.js';
+    import { initAuth, checkUserSignedIn } from './js/auth.js';
+    import { initFirestore, createNew, getListByEmail, getOneById, updateById, deleteById, updateGeneralById } from './js/firestore.js';
+    import { initRealtimeDB, write, listen } from './js/realtime-db.js';
+
+    const auth = initAuth(app);
+    initFirestore(app);
+    initRealtimeDB(app);
+    window.writeDB = write;
+    window.isRender = false;
+
+    
+
+
+
+    checkUserSignedIn(auth,
+      (user) => {
+        let id = getParamsFromURL('id');
+        
+
+        if (!id) {
+          console.log('Không tìm thấy dự án');
+          window.open('./home.html', '_self')
+        }
+
+        getOneById(id).then(project => {
+          document.getElementById('project-name').innerText = project.name;
+          data2Table(project.data);
+
+          
+
+          
+
+          window.projectId = id;
+          window.project = project;
+
+          hideLoader();
+          
+
+          listen(window.projectId, (data) => {
+            if (data) {
+              window.isRender = true;
+              data2Table(data);
+              
+            } else {
+              write(id, project.data);
+            }
+          });
+
+          window.showModalShare = () => {
+            document.getElementById('project-name').value = project.name;
+            document.getElementById('project-members').value = project.members;
+            document.getElementById('project-shareable').checked = project.shareable;
+            let embedCode = `${window.location.origin}/view.html?id=${id}`;
+            document.getElementById('project-embed-link').value = embedCode;
+            
+
+            let modal = document.getElementById('modal-update-project-name');
+            modal.style.display = "flex";
+          }
+
+          window.updateProjectName = () => {
+            let newName = document.getElementById('project-name').value;
+            let shareable = document.getElementById('project-shareable').checked;
+            let members = document.getElementById('project-members').value;
+
+          document.getElementById('project-name').innerText = newName;
+            updateGeneralById(window.projectId, newName, shareable, members).then(result => {
+              if (result) window.location.reload();
+              else alert('Không thành công');
+
+              hideModal('modal-update-project-name');
+            });
+          }
+        });
+      },
+      () => window.open('./login.html', '_self'),
+    );
+
+    function getParamsFromURL(paramName) {
+      let url = new URL(window.location.href);
+      return url.searchParams.get(paramName);
+    }
+
+    window.signOut = () => {
+      auth.signOut();
+    }
+
+    window.copyLink = () => {
+      /* Get the text field */
+      var copyText = document.getElementById("project-embed-link");
+
+      /* Select the text field */
+      copyText.select();
+      copyText.setSelectionRange(0, 99999); /* For mobile devices */
+
+      /* Copy the text inside the text field */
+      navigator.clipboard.writeText(copyText.value);
+    }
+  </script>
+</body>
+
+</html>
+<style lang="css" scoped>
+  .back {
+    width: 54px;
+    height: 48px;
+    right: 95px;
+    top: 80px;
+    position: fixed;
+    display: flex;
+  }
+  .reload {
+    width: 54px;
+    height: 48px;
+    right: 150px;
+    top: 80px;
+    position: fixed;
+    display: flex;
+
+  }
+  .date-picker {
+    width: 100%;
+  }
+
+  .date-picker1 {
+    width: 100%;
+  }
+
+  .rePort {
+    margin-left: 20%;
+  }
+  
+</style>
